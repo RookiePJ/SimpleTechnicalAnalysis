@@ -4,6 +4,7 @@ import talib as ta
 import pandas as pd
 import matplotlib.pyplot as plt
 import argparse
+import seaborn as sns
 
 argParser = argparse.ArgumentParser()
 argParser.add_argument("-f", "--filename", help="name of file containing price data")
@@ -29,12 +30,18 @@ PriceData['slowk'], PriceData['slowd'] = ta.STOCH(PriceData['High'], PriceData['
 PriceData['Signal_Buy'] = ((PriceData['slowk'] > PriceData['slowd']) & (PriceData['slowk'].shift(1) < PriceData['slowd'].shift(1))) & (PriceData['slowd'] < 20)
 PriceData['Signal_Sell'] = ((PriceData['slowk'] < PriceData['slowd']) & (PriceData['slowk'].shift(1) > PriceData['slowd'].shift(1))) & (PriceData['slowd'] > 80)
 
+#PriceData.rename(columns={'Price': 'Date'}, inplace=True)
+
 #Output results
 PriceData.to_csv(OUTPUT_DIRECTORY + "Stochastic-" + INPUT_FILE, index=True, encoding='-&utf8')
-print("Outputing calculated data to --> " + OUTPUT_DIRECTORY + "Stochastic-" + INPUT_FILE)
+print("Outputting calculated data to --> " + OUTPUT_DIRECTORY + "Stochastic-" + INPUT_FILE)
+
+jsonDataFrame = PriceData[['Price', 'Close', 'Signal_Buy', 'Signal_Sell']].copy()
+jsonDataFrameLimited = pd.DataFrame(jsonDataFrame, columns=['Price', 'Close', 'Signal_Buy', 'Signal_Sell'].copy())
+jsonDataFrameLimited.to_json(OUTPUT_DIRECTORY + "Stochastic-" + INPUT_FILE + ".json")
+print("Outputting JSON calculated data to " + OUTPUT_DIRECTORY + "Stochastic-" + INPUT_FILE + ".json")
 
 #print (PriceData)
-
 #Plot Values
 fig1, ax = plt.subplots(2, figsize=(15,8))
 ax[0].plot(PriceData['Close'])

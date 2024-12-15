@@ -1,4 +1,4 @@
-
+import proxy
 import yfinance as yf
 import argparse
 
@@ -13,16 +13,23 @@ args = argParser.parse_args()
 #print("args=%s" + args)
 
 TICKER = args.ticker
+#TICKER= 'GBPUSD=X'
 INTERVAL= args.interval
 START_DATE = args.startdate
 END_DATE = args.enddate
 
+#OUTPUT_FILE = 'GBP-USD' + "-" + INTERVAL + "-" + START_DATE + "-" + END_DATE + ".csv"
 OUTPUT_FILE = TICKER + "-" + INTERVAL + "-" + START_DATE + "-" + END_DATE + ".csv"
 
 #Fetch historical data from yahoo
 data = yf.download(TICKER, start=START_DATE, end=END_DATE, interval=INTERVAL)
 
+data.rename(columns={'Price': 'Date'}, inplace=True)
+
 print("Writing out data to --> " + OUTPUT_FILE)
 
 #Write out to a csv file
-data.to_csv(OUTPUT_FILE, index=True, encoding='=-&utf8')
+data.to_csv(OUTPUT_FILE, index=True, index_label='Date', encoding='=-&utf8')
+
+#jsonDataFrame = data, columns=['Price', 'Close'].copy()
+#data.to_json(OUTPUT_FILE + '.json')
